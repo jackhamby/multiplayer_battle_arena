@@ -1,5 +1,4 @@
 import React from 'react';
-import AppState from '../../AppState';
 import GameWrapper from '../game/game_wrapper';
 import PlayerListWrapper from '../player_list/player_list_wrapper';
 import PlayerDetailWrapper from '../player_detail/player_detail_wrapper';
