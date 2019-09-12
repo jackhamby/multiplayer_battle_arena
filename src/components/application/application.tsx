@@ -3,7 +3,7 @@ import GameWrapper from '../game/game_wrapper';
 import PlayerListWrapper from '../player_list/player_list_wrapper';
 import PlayerDetailWrapper from '../player_detail/player_detail_wrapper';
 import HeaderWrapper from '../header/header_wrapper';
-import ConnectionManager from '../../util/connection_manager';
+import ConnectionManager from '../../util/connection_manager'
 import Error from '../util/error';
 
 export interface AppState {
@@ -38,6 +38,8 @@ class Application extends React.Component<AppProps, AppState>{
     }
 
     render() {
+        console.log('render')
+        console.log(this.state.error)
         if (this.state.error){
             return (
                 <div className="container-fluid container">
@@ -45,20 +47,23 @@ class Application extends React.Component<AppProps, AppState>{
                 </div>
             )
         }
-        return (
-            <div className="container-fluid container"> 
-                <div className="row top-container">
-                    <HeaderWrapper></HeaderWrapper>
+        else{
+            return (
+                <div className="container-fluid container"> 
+                    <div className="row top-container">
+                        <HeaderWrapper></HeaderWrapper>
+                    </div>
+                    <div className="row center-container">
+                        <GameWrapper></GameWrapper>
+                        <PlayerListWrapper></PlayerListWrapper>
+                    </div>
+                    <div className="row bottom-container">
+                        <PlayerDetailWrapper></PlayerDetailWrapper>
+                    </div>
                 </div>
-                <div className="row center-container">
-                    <GameWrapper></GameWrapper>
-                    <PlayerListWrapper></PlayerListWrapper>
-                </div>
-                <div className="row bottom-container">
-                    <PlayerDetailWrapper></PlayerDetailWrapper>
-                </div>
-            </div>
-        )
+            )
+        }
+
     }
 }
 export default Application;
