@@ -5,6 +5,9 @@ import PlayerDetailWrapper from '../player_detail/player_detail_wrapper';
 import HeaderWrapper from '../header/header_wrapper';
 import ConnectionManager from '../../util/connection_manager'
 import Error from '../util/error';
+// import io from 'socket.io';
+// import openSocket from 'socket.io-client';
+
 
 export interface AppState {
     players: Player[];
@@ -29,17 +32,19 @@ class Application extends React.Component<AppProps, AppState>{
             players: [],
             error: undefined
         } as AppState;
+
+    }
+
+    componentDidMount(){
         try{
-            connectionManager.connect();
+            connectionManager.connect();     
         }
-        catch (error){
-            this.setState({error: "Failed to connect. Game Server is not running"});
+        catch (err){
+            this.setState({error: err});
         }
     }
 
     render() {
-        console.log('render')
-        console.log(this.state.error)
         if (this.state.error){
             return (
                 <div className="container-fluid container">
