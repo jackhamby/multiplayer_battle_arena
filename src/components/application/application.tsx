@@ -8,9 +8,10 @@ import Error from '../util/error';
 import { Provider } from 'react-redux';
 import { createStore } from 'redux';
 import { rootReducer } from '../../reducers/root_reducer';
-import { create } from 'domain';
 // import io from 'socket.io';
 // import openSocket from 'socket.io-client';
+import { connect, disconnect } from '../../reducers/connection_reducer';
+import { ActionCreator } from 'redux';
 
 
 export interface AppState {
@@ -41,7 +42,8 @@ class Application extends React.Component<AppProps, AppState>{
         } as AppState;
         console.log(store.getState())
         const unsubscribe = store.subscribe(() => console.log(store.getState()))
-        store.dispatch({type: 'CONNECT'})
+        store.dispatch(connect());
+        store.dispatch(disconnect())
 
 
     }

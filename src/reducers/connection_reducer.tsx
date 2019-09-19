@@ -1,35 +1,40 @@
 import AppState from '../components/application/application';
-import { AnyAction, Reducer } from 'redux';
+import { Reducer, Action} from 'redux';
 
-  
-  // Unfortunately, typing of the `action` parameter seems to be broken at the moment.
-  // This should be fixed in Redux 4.x, but for now, just augment your types.
-  
-//   const reducer: Reducer<ChatState> = (state: ChatState = initialState, action) => {
-//     // We'll augment the action type on the switch case to make sure we have
-//     // all the cases handled.
-//     switch ((action as ChatActions).type) {
-//       case '@@chat/SET_USERNAME':
-//         return { ...state, username: action.username };
-//       case '@@chat/USERS_LIST_UPDATED':
-//         return { ...state, connectedUsers: action.users };
-//       case '@@chat/MESSAGE_RECEIVED':
-//         return { ...state, messages: [...state.messages, action.payload] };
-//       default:
-//         return state;
-//     }
-//   };
-  
-//   export default reducer;
+export const CONNECT = "CONNECT";
+export const DISCONNECT = "DISCONNECT";
+
+
+export interface ConnectAction extends Action {
+    type: typeof CONNECT
+}
+
+export interface DisconnectAction extends Action {
+    type: typeof DISCONNECT
+}
+
+export const connect = () => {
+    return {
+        type: CONNECT
+    }
+}
+
+export const disconnect = () => {
+    return {
+        type: DISCONNECT
+    }
+}
 
 const connection_reducer: Reducer<AppState> = (state: AppState = { } as AppState, action) => {
     switch(action.type){
-        case 'CONNECT':
-            console.log('picked up by reducer')
+        case CONNECT:
+            console.log('connect hooked into reducers')
+            return state;
+        case DISCONNECT:
+            console.log('disconnect hooked into reducer')
             return state;
         default: 
             return state;
     }
 }
-
 export default connection_reducer;
