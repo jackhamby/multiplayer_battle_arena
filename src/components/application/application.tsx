@@ -5,6 +5,10 @@ import PlayerDetailWrapper from '../player_detail/player_detail_wrapper';
 import HeaderWrapper from '../header/header_wrapper';
 import ConnectionManager from '../../util/connection_manager'
 import Error from '../util/error';
+import { Provider } from 'react-redux';
+import { createStore } from 'redux';
+import { rootReducer } from '../../reducers/root_reducer';
+import { create } from 'domain';
 // import io from 'socket.io';
 // import openSocket from 'socket.io-client';
 
@@ -12,6 +16,7 @@ import Error from '../util/error';
 export interface AppState {
     players: Player[];
     error?: string;
+    isConnected: boolean;
 }
 
 export interface Player {
@@ -24,28 +29,40 @@ export interface Player {
 export interface AppProps {};
 
 const connectionManager = new ConnectionManager();
+const store = createStore(rootReducer);
 
 class Application extends React.Component<AppProps, AppState>{
     constructor(props: AppProps){
         super(props);
         this.state = {
             players: [],
+            isConnected: false,
             error: undefined
         } as AppState;
+        console.log(store.getState())
+        const unsubscribe = store.subscribe(() => console.log(store.getState()))
+        store.dispatch({type: 'CONNECT'})
+
 
     }
 
     componentDidMount(){
-        try{
-            connectionManager.connect();     
-        }
-        catch (err){
-            this.setState({error: err});
-        }
+        connectionManager.connect(
+            this.onConnect.bind(this),
+            this.onDisconnect.bind(this)
+        );     
+    }
+
+    onConnect(event: Event){
+        this.setState({isConnected: true});
+    }
+
+    onDisconnect(event: CloseEvent){
+        this.setState({ isConnected: false});
     }
 
     render() {
-        if (this.state.error){
+        if (!this.state.isConnected){
             return (
                 <div className="container-fluid container">
                     <Error></Error>
@@ -54,18 +71,20 @@ class Application extends React.Component<AppProps, AppState>{
         }
         else{
             return (
-                <div className="container-fluid container"> 
-                    <div className="row top-container">
-                        <HeaderWrapper></HeaderWrapper>
+                <Provider store={store}>
+                    <div className="container-fluid container"> 
+                        <div className="row top-container">
+                            <HeaderWrapper></HeaderWrapper>
+                        </div>
+                        <div className="row center-container">
+                            <GameWrapper></GameWrapper>
+                            <PlayerListWrapper></PlayerListWrapper>
+                        </div>
+                        <div className="row bottom-container">
+                            <PlayerDetailWrapper></PlayerDetailWrapper>
+                        </div>
                     </div>
-                    <div className="row center-container">
-                        <GameWrapper></GameWrapper>
-                        <PlayerListWrapper></PlayerListWrapper>
-                    </div>
-                    <div className="row bottom-container">
-                        <PlayerDetailWrapper></PlayerDetailWrapper>
-                    </div>
-                </div>
+                </Provider>
             )
         }
 

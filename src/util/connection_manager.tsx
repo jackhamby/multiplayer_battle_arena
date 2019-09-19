@@ -6,53 +6,60 @@ import openSocket from 'socket.io-client';
 // console.log('mouting')
 class ConnectionManager {
     
-    isReady: boolean;
+    // isReady: boolean;
     socket: SocketIOClient.Socket;
 
     constructor(){
-        this.isReady = false;
+        // this.isReady = false;
         this.socket =  {} as SocketIOClient.Socket;
     }
 
-    connect(){
-        this.socket = openSocket('http://localhost:3001');
+    connect(onConnect: Function, onDisconnect: Function){
+        this.socket = openSocket('http://localhost:3001', {});
         this.socket.send('hello something');
-        // console.log('mouting')
-        this.socket.on('message', (update: any) => {
-            console.log('update sent with ')
-            console.log(update)
-        })
-        // this.socket = new WebSocket(
-        //     `${config.gameServerUrl}:${config.gameServerPort}`
-        // );
-        // this.socket.onerror = this.error.bind(this);
-        // this.socket.onmessage = this.receive.bind(this);
-        // this.socket.onclose =  this.close.bind(this);
-        // this.socket.onopen = this.open.bind(this);
+        this.socket.on('message', this.receive.bind(this));
+        this.socket.on('connect_error', this.error.bind(this));
+        this.socket.on('connect', onConnect);
+        this.socket.on('disconnect', onDisconnect);
     }
 
     send(message: string){
+        console.log('\n');
+        console.log(`sending this message to the server ${message}`);
+        console.log('\n');
+
         this.socket.send(message);
     }
 
     receive(event: MessageEvent){
+        console.log('\n');
+        console.log(`recieved message from server ${event}`);
+        console.log('\n');
 
     }
 
-    open(event: Event){
-        console.log('opened connection')
-        this.send('FUCK WAS')
+    // open(event: Event){
+    //     console.log('\n');
+    //     console.log('opened connection');
+    //     console.log('\n');
 
-    }   
+    //     this.isReady = true;
+    // }   
 
     error(event: Event){
-        console.log(event)
-        // throw('Failed to connect to game server.')
+        console.log('\n');
+        console.log('there was an error connecting');
+        console.log('\n');
+        
+        // this.isReady = false;
     }
 
-    close(event: CloseEvent){
+    // close(event: CloseEvent){
+    //     console.log('\n');
+    //     console.log('connection was closed')
+    //     console.log('\n');
 
-    }
+    // }
 
 }
 
