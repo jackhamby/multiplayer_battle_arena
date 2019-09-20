@@ -29,15 +29,18 @@ export const disconnect = () => {
 const connection_reducer: Reducer<AppState> = (state: AppState = { } as AppState, action) => {
     switch(action.type){
         case CONNECT:
-            console.log('connect hooked into reducers')
-            console.log()
+            console.log('connect hooked into reducer')
             return {
                 ...state,
-                players: []
+                players: [],
+                isConnected: true
             } as AppState;
         case DISCONNECT:
             console.log('disconnect hooked into reducer')
-            return state;
+            return {
+                ...state,
+                isConnected: false
+            }
         default: 
             return state;
     }

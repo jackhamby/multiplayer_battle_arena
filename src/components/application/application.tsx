@@ -5,13 +5,15 @@ import PlayerDetailWrapper from '../player_detail/player_detail_wrapper';
 import HeaderWrapper from '../header/header_wrapper';
 import ConnectionManager from '../../util/connection_manager'
 import Error from '../util/error';
-import { Provider } from 'react-redux';
-import { createStore } from 'redux';
-import { rootReducer } from '../../reducers/root_reducer';
+// import { Provider } from 'react-redux';
+import { createStore} from 'redux';
+// import { rootReducer } from '../../reducers/root_reducer';
 // import io from 'socket.io';
 // import openSocket from 'socket.io-client';
+import *  as redux from 'react-redux';
 import { connect, disconnect } from '../../reducers/connection_reducer';
 import { ActionCreator } from 'redux';
+
 
 
 export interface AppState {
@@ -27,10 +29,13 @@ export interface Player {
     y: number;
 }
 
-export interface AppProps {};
+export interface AppProps {
+    // connect: () => void;
+};
 
 const connectionManager = new ConnectionManager();
-const store = createStore(rootReducer);
+// const store = createStore(rootReducer);
+
 
 class Application extends React.Component<AppProps, AppState>{
     constructor(props: AppProps){
@@ -40,30 +45,30 @@ class Application extends React.Component<AppProps, AppState>{
             isConnected: false,
             error: undefined
         } as AppState;
-        console.log(store.getState())
-        const unsubscribe = store.subscribe(() => console.log(store.getState()))
-        store.dispatch(connect());
-        store.dispatch(disconnect())
-
-
+        // console.log(store.getState())
+        // const unsubscribe = store.subscribe(() => console.log(store.getState()))
+        // store.dispatch(open());
+        // store.dispatch(disconnect())
     }
 
     componentDidMount(){
-        connectionManager.connect(
-            this.onConnect.bind(this),
-            this.onDisconnect.bind(this)
-        );     
+        // this.props.connect();
+        connectionManager.connect();   
+        // store.dispatch(connect());
+        // this.setState({isConnected: true});
     }
 
     onConnect(event: Event){
-        this.setState({isConnected: true});
+        // this.setState({isConnected: true});
     }
 
     onDisconnect(event: CloseEvent){
-        this.setState({ isConnected: false});
+        // this.setState({ isConnected: false});
     }
 
     render() {
+        console.log('rendering')
+        console.log(this.state.isConnected)
         if (!this.state.isConnected){
             return (
                 <div className="container-fluid container">
@@ -73,23 +78,37 @@ class Application extends React.Component<AppProps, AppState>{
         }
         else{
             return (
-                <Provider store={store}>
-                    <div className="container-fluid container"> 
-                        <div className="row top-container">
-                            <HeaderWrapper></HeaderWrapper>
-                        </div>
-                        <div className="row center-container">
-                            <GameWrapper></GameWrapper>
-                            <PlayerListWrapper></PlayerListWrapper>
-                        </div>
-                        <div className="row bottom-container">
-                            <PlayerDetailWrapper></PlayerDetailWrapper>
-                        </div>
+                <div className="container-fluid container"> 
+                    <div className="row top-container">
+                        <HeaderWrapper></HeaderWrapper>
                     </div>
-                </Provider>
+                    <div className="row center-container">
+                        <GameWrapper></GameWrapper>
+                        <PlayerListWrapper></PlayerListWrapper>
+                    </div>
+                    <div className="row bottom-container">
+                        <PlayerDetailWrapper></PlayerDetailWrapper>
+                    </div>
+                </div>
             )
         }
-
     }
 }
-export default Application;
+
+
+export const mapStateToProps = (state: AppState) => {
+    // console.log(state)
+    // console.log('connected map state to props!')
+    return state;
+}
+
+export const mapDispatchToProps = (dispatch: Function) => {
+    return {
+        // connect: () => dispatch(connect()),
+    };
+}
+
+const ConnectedApplication = redux.connect(mapStateToProps, mapDispatchToProps)(Application)
+
+export default ConnectedApplication;
+// export default Application;
