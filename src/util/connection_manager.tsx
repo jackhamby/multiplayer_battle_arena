@@ -2,16 +2,20 @@ import config from '../settings';
 import io from 'socket.io';
 import openSocket from 'socket.io-client';
 import { connect } from 'react-redux';
-import { store } from '../App';
+// import { store } from '../App';
 
 class ConnectionManager {
     
     // isReady: boolean;
     socket: SocketIOClient.Socket;
+    onOpen: Function;
+    onClose: Function;
 
-    constructor(){
+    constructor(connect: Function = () => {}, disconnect: Function = () => {}){
         // this.isReady = false;
         this.socket =  {} as SocketIOClient.Socket;
+        this.onOpen = connect;
+        this.onClose = disconnect;
     }
 
     connect(){
@@ -19,9 +23,18 @@ class ConnectionManager {
         this.socket.send('hello something');
         this.socket.on('message', this.receive.bind(this));
         this.socket.on('connect_error', this.error.bind(this));
-        this.socket.on('connect', () => { store.dispatch({"type" : "CONNECT"})});
-        this.socket.on('disconnect', () => {});
+        this.socket.on('connect', this.open.bind(this));
+        this.socket.on('disconnect', this.close.bind(this));
     }
+
+    open(){
+        this.onOpen();
+    }
+
+    close(reason: string){
+        this.onClose(reason);
+    }
+
 
     send(message: string){
         console.log('\n');

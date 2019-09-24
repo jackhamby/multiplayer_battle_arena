@@ -1,21 +1,18 @@
 import React from 'react';
-import Application from './components/application/application';
 import './App.css';
 import { createStore} from 'redux';
 import { Provider } from 'react-redux';
 import { rootReducer } from './reducers/root_reducer';
 import ConnectedApplication from './components/application/application';
+import { initialState } from './settings';
 
 
-export const store = createStore(rootReducer);
+export const store = createStore(rootReducer, initialState);
 
 class App extends React.Component {
 	render(){
 		return (
-			<Provider store={store}>
-				<ConnectedApplication/>
-			</Provider>
-			
+			<ConnectedApplication/>			
 		);
 	}
 

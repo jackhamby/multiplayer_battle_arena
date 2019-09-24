@@ -13,11 +13,11 @@ import { createStore} from 'redux';
 import *  as redux from 'react-redux';
 import { connect, disconnect } from '../../reducers/connection_reducer';
 import { ActionCreator } from 'redux';
+// import { store } from '../../App';
 
 
 
 export interface AppState {
-    players: Player[];
     error?: string;
     isConnected: boolean;
 }
@@ -30,45 +30,48 @@ export interface Player {
 }
 
 export interface AppProps {
-    // connect: () => void;
+    connect: () => void;
+    disconnect: (reason: string) => void;
+    connectionManager: ConnectionManager;
+    players: Player[];
 };
 
 const connectionManager = new ConnectionManager();
 // const store = createStore(rootReducer);
 
-
 class Application extends React.Component<AppProps, AppState>{
     constructor(props: AppProps){
         super(props);
         this.state = {
-            players: [],
             isConnected: false,
             error: undefined
         } as AppState;
-        // console.log(store.getState())
-        // const unsubscribe = store.subscribe(() => console.log(store.getState()))
-        // store.dispatch(open());
-        // store.dispatch(disconnect())
     }
 
     componentDidMount(){
-        // this.props.connect();
-        connectionManager.connect();   
-        // store.dispatch(connect());
-        // this.setState({isConnected: true});
+        // Hooking into optional open/close
+        // events for connectionManager 
+        connectionManager.onOpen = this.onConnect.bind(this);
+        connectionManager.onClose = this.onDisconnect.bind(this);
+        // Attempt to open socket
+        connectionManager.connect(); 
     }
 
-    onConnect(event: Event){
-        // this.setState({isConnected: true});
+    onConnect(){
+        // dispatch connect action
+        this.props.connect();
+        this.setState({ isConnected: true });
     }
 
-    onDisconnect(event: CloseEvent){
-        // this.setState({ isConnected: false});
+    onDisconnect(reason: string){
+        // dispath disconnect action
+        this.props.disconnect(reason);
+        this.setState({ isConnected: false});
     }
+
+    
 
     render() {
-        console.log('rendering')
-        console.log(this.state.isConnected)
         if (!this.state.isConnected){
             return (
                 <div className="container-fluid container">
@@ -97,18 +100,16 @@ class Application extends React.Component<AppProps, AppState>{
 
 
 export const mapStateToProps = (state: AppState) => {
-    // console.log(state)
-    // console.log('connected map state to props!')
     return state;
 }
 
 export const mapDispatchToProps = (dispatch: Function) => {
     return {
-        // connect: () => dispatch(connect()),
+        connect: () => dispatch(connect()),
+        disconnect: (reason: string ) => dispatch(disconnect(reason))
     };
 }
 
 const ConnectedApplication = redux.connect(mapStateToProps, mapDispatchToProps)(Application)
 
 export default ConnectedApplication;
-// export default Application;
