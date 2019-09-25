@@ -1,4 +1,4 @@
-import{ AppState } from './components/application/application';
+import{ AppState, Player } from './components/application/application';
 interface AppConfig  {
     gameServerUrl: string;
     gameServerPort: number;
@@ -9,7 +9,7 @@ const config = {
 } as AppConfig;
 
 export const initialState = {
-    players: [],
+    players: [] as Player[],
     isConnected: false,
     error: undefined
 } as AppState;

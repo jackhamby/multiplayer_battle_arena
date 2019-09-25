@@ -1,4 +1,5 @@
-import { AppState } from '../components/application/application';
+import { AppState, Player } from '../components/application/application';
+// import { initialState } from '../settings';
 import { Reducer, Action} from 'redux';
 
 export const CONNECT = "CONNECT";
@@ -27,19 +28,26 @@ export const disconnect = (reason: string) => {
     } as DisconnectAction
 }
 
-const connection_reducer: Reducer<AppState> = (state: AppState = { } as AppState, action) => {
+const initialState = {
+    isConnected: false,
+    players: [] as Player[],
+    error: undefined
+} as AppState;
+
+const connection_reducer: Reducer<AppState> = (state: AppState = initialState, action) => {
     switch(action.type){
         case CONNECT:
             console.log('connect hooked into reducer');
             return {
-                ...state,
-                players: [],
+                error: state.error,
+                players: state.players,
                 isConnected: true
             } as AppState;
         case DISCONNECT:
             console.log('disconnect hooked into reducer');
             return {
-                ...state,
+                error: state.error,
+                players: state.players,
                 isConnected: false
             } as AppState;
         default: 

@@ -11,8 +11,10 @@ import { createStore} from 'redux';
 // import io from 'socket.io';
 // import openSocket from 'socket.io-client';
 import *  as redux from 'react-redux';
-import { connect, disconnect } from '../../reducers/connection_reducer';
+// import { connect, disconnect } from '../../reducers/connection_reducer';
 import { ActionCreator } from 'redux';
+// import { addPlayer, removePlayer } from '../../reducers/game_reducer'??/;
+import { connect, disconnect, addPlayer, removePlayer, init } from '../../reducers/root_reducer'
 // import { store } from '../../App';
 
 
@@ -20,59 +22,82 @@ import { ActionCreator } from 'redux';
 export interface AppState {
     error?: string;
     isConnected: boolean;
+    players: Player[];
+    currentPlayer?: Player;
 }
 
 export interface Player {
-    ip: string;
+    id?: string;
     name: string;
     x: number;
     y: number;
 }
 
+export interface Message {
+    type: string;
+    data: any;
+}
+
+export const WELCOME_MESSAGE = "welcome";
+export interface WelcomeData {
+    id: string;
+    state: AppState;
+}
+
+
 export interface AppProps {
     connect: () => void;
     disconnect: (reason: string) => void;
+    addPlayer: (id: string) => void;
+    removePlayer: () => void;
+    init: (state: AppState) => void;
     connectionManager: ConnectionManager;
     players: Player[];
+    isConnected: boolean;
 };
 
 const connectionManager = new ConnectionManager();
-// const store = createStore(rootReducer);
 
 class Application extends React.Component<AppProps, AppState>{
     constructor(props: AppProps){
         super(props);
-        this.state = {
-            isConnected: false,
-            error: undefined
-        } as AppState;
-    }
-
-    componentDidMount(){
         // Hooking into optional open/close
         // events for connectionManager 
         connectionManager.onOpen = this.onConnect.bind(this);
         connectionManager.onClose = this.onDisconnect.bind(this);
+        connectionManager.onMessage = this.onMessage.bind(this);
         // Attempt to open socket
         connectionManager.connect(); 
+
+    }
+
+    componentDidMount(){
+
     }
 
     onConnect(){
-        // dispatch connect action
         this.props.connect();
-        this.setState({ isConnected: true });
+        // this.props.addPlayer();
     }
 
     onDisconnect(reason: string){
-        // dispath disconnect action
         this.props.disconnect(reason);
-        this.setState({ isConnected: false});
     }
 
-    
+    onMessage(message: Message){
+        console.log(message)
+        switch(message.type){
+            case(WELCOME_MESSAGE):
+                this.props.init(message.data.state)
+                this.props.addPlayer(message.data.id);
+                console.log('welcomed')
+                console.log()
+        }
+    }
 
     render() {
-        if (!this.state.isConnected){
+        console.log(this.props)
+        if (!this.props.isConnected){
             return (
                 <div className="container-fluid container">
                     <Error></Error>
@@ -100,13 +125,18 @@ class Application extends React.Component<AppProps, AppState>{
 
 
 export const mapStateToProps = (state: AppState) => {
-    return state;
+    return {
+        ...state,
+    };
 }
 
 export const mapDispatchToProps = (dispatch: Function) => {
     return {
         connect: () => dispatch(connect()),
-        disconnect: (reason: string ) => dispatch(disconnect(reason))
+        disconnect: (reason: string ) => dispatch(disconnect(reason)),
+        addPlayer: (id: string) => dispatch(addPlayer(id)),
+        removePlayer: () => dispatch(removePlayer()),
+        init: (state: AppState) => dispatch(init(state)),
     };
 }
 
