@@ -9,9 +9,10 @@ const config = {
 } as AppConfig;
 
 export const initialState = {
-    players: [] as Player[],
+    players: {},
     isConnected: false,
-    error: undefined
+    error: undefined,
+    currentPlayerId: "",
 } as AppState;
 
 export default config;

@@ -17,29 +17,34 @@ export const CONNECT = "CONNECT";
 export const DISCONNECT = "DISCONNECT";
 export const ADD_PLAYER = "ADD_PLAYER";
 export const REMOVE_PLAYER = "REMOVE_PLAYER";
+export const UPDATE_PLAYER = "UPDATE_PLAYER";
 
 // Actions
 export interface InitAction extends Action {
     type: typeof INIT,
     state: AppState
 }
-
 export interface ConnectAction extends Action {
     type: typeof CONNECT
 }
-
 export interface DisconnectAction extends Action {
     type: typeof DISCONNECT,
-    reason: string
+    event: Event,
+    id: string
 }
-
 export interface AddPlayerAction extends Action {
     type: typeof ADD_PLAYER,
     id: string,
 }
-
 export interface RemovePlayerAction extends Action {
-    type: typeof REMOVE_PLAYER
+    type: typeof REMOVE_PLAYER,
+    id: string
+}
+export interface UpdatePlayerAction extends Action {
+    type: typeof UPDATE_PLAYER,
+    id: string;
+    x: number;
+    y: number;
 }
 
 export const init = (state: AppState) => {
@@ -56,10 +61,20 @@ export const addPlayer = (id: string) => {
     } as AddPlayerAction;
 }
 
-export const removePlayer = () => {
+export const removePlayer = (id: string) => {
     return {
-        type: REMOVE_PLAYER
+        type: REMOVE_PLAYER,
+        id
     } as RemovePlayerAction;
+}
+
+export const updatePlayer = (id: string, x: number, y: number) => {
+    return {
+        type: UPDATE_PLAYER,
+        id,
+        x,
+        y
+    } as UpdatePlayerAction
 }
 
 export const connect = () => {
@@ -68,67 +83,107 @@ export const connect = () => {
     } as ConnectAction
 }
 
-export const disconnect = (reason: string) => {
+export const disconnect = (event: Event, id: string) => {
     return {
         type: DISCONNECT,
-        reason: reason
+        event,
+        id
     } as DisconnectAction
 }
 
 const initialState = {
     isConnected: false,
-    players: [] as Player[]
+    players: {},
+    currentPlayerId: ""
 } as AppState;
  
 
 const rootReducer: Reducer<AppState> = (state: AppState = initialState, action) => {
-
     switch(action.type){
 
         // Connection actions
         case INIT:
-            console.log('need to initialize application')
-            console.log(state)
-        case CONNECT:
-            console.log('connect hooked into reducer');
+            console.log('\n')
+            console.log('intialize in reducer')
+            console.log('\n')
             return {
+                ...state,
+                ...action.state,
+            }
+        case CONNECT:
+            console.log('\n')
+            console.log('connect hooked into reducer');
+            console.log('\n')
+            return {
+                ...state,
                 error: state.error,
                 players: state.players,
                 isConnected: true
             } as AppState;
         case DISCONNECT:
+            console.log('\n')
             console.log('disconnect hooked into reducer');
+            console.log('\n')
             return {
+                ...state,
                 error: state.error,
                 players: state.players,
                 isConnected: false
             } as AppState;
-        
 
 
 
-        case (ADD_PLAYER):
-            console.log('add player in game_reducer');
-            // console.log(state)
+
+
+
+        case ADD_PLAYER:
             const newPlayer = {
                 id: action.id,
                 name: `player${state.players.length}`,
                 x: 0,
                 y: 0
             } as Player;
+            console.log('\n')
+            console.log(`add player in reducer  ${action.id}`);
+            console.log('\n')
+            
             return {
                 error: state.error,
                 isConnected: state.isConnected,
-                players: [
+                players: {
                     ...state.players,
-                    newPlayer
-                ]
+                    [newPlayer.id] : newPlayer,
+                },
+                currentPlayerId: state.currentPlayerId ? state.currentPlayerId : newPlayer.id
             };
-        case (REMOVE_PLAYER):
-            console.log('remove player in game reducer')  
+        case REMOVE_PLAYER:
+            console.log('\n')
+            console.log(`remove player in reducer ${ action.id }`)  
+            console.log('\n')
+
+            delete state.players[action.id]
             return {
-                ...state
+                ...state,
+                players: {
+                    ...state.players
+                }
             };
+
+
+        case UPDATE_PLAYER:
+            console.log('\n')
+            console.log(`update player in reducer ${ action.id } ${action.x}, ${action.y}`)  
+            console.log('\n')
+            state.players[action.id].x = action.x;
+            state.players[action.id].y = action.y;
+            return {
+                ...state,
+                players: {
+                    ...state.players
+                }
+            }
+    
+        
         default:
             return state  
  

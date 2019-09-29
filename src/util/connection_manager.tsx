@@ -2,6 +2,7 @@ import config from '../settings';
 import io from 'socket.io';
 import openSocket from 'socket.io-client';
 import { connect } from 'react-redux';
+import { Message } from '../components/application/application';
 // import { store } from '../App';
 
 
@@ -33,12 +34,18 @@ class ConnectionManager {
         this.socket.on('disconnect', this.onClose.bind(this));
     }
 
-    // send(message: string){
-    //     console.log('\n');
-    //     console.log(`sending this message to the server ${message}`);
-    //     console.log('\n');
-    //     this.socket.send(message);
-    // }
+    send(message: string){
+        console.log('\n');
+        console.log(`sending this message to the server ${message}`);
+        console.log('\n');
+        this.socket.send(message);
+    }
+
+    emit(message: Message){
+
+        this.socket.emit('message', message);
+        // this.socket.send('fuck')
+    }
 
     error(event: Event){
         console.log('\n');
