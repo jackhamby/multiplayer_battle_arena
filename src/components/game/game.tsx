@@ -13,6 +13,9 @@ export interface GameProps {
 
 export interface GameState {
     leftKey: Key
+    rightKey: Key;
+    downKey: Key;
+    upKey: Key;
 }
 
 class Game extends React.Component <GameProps, GameState>{
@@ -20,6 +23,30 @@ class Game extends React.Component <GameProps, GameState>{
     constructor(props: GameProps){
         super(props);
         const leftKey = keyboard("a");
+        const rightKey = keyboard("d");
+        const upKey = keyboard("w");
+        const downKey = keyboard("s");
+        rightKey.press = () => {
+            const currentPlayer = this.props.players[this.props.currentPlayerId]
+            this.props.update(
+                this.props.currentPlayerId,
+                currentPlayer.x + 2,
+                currentPlayer.y);
+        };
+        upKey.press = () => {
+            const currentPlayer = this.props.players[this.props.currentPlayerId]
+            this.props.update(
+                this.props.currentPlayerId,
+                currentPlayer.x,
+                currentPlayer.y - 2);
+        }
+        downKey.press = () => {
+            const currentPlayer = this.props.players[this.props.currentPlayerId]
+            this.props.update(
+                this.props.currentPlayerId,
+                currentPlayer.x,
+                currentPlayer.y + 2);
+        }
         leftKey.press = () => {
             // console.log('pressed left')
             // console.log(this.props.currentPlayer.x)
@@ -31,10 +58,13 @@ class Game extends React.Component <GameProps, GameState>{
         };
         
         leftKey.release = () => {
-          console.log('release elft')  
+        //   console.log('release elft')  
         };
         this.state = {
-            leftKey: leftKey
+            leftKey: leftKey,
+            rightKey: rightKey,
+            upKey: upKey,
+            downKey: downKey
         };
 
     }

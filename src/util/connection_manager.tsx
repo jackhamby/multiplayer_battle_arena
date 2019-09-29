@@ -42,9 +42,7 @@ class ConnectionManager {
     }
 
     emit(message: Message){
-
         this.socket.emit('message', message);
-        // this.socket.send('fuck')
     }
 
     error(event: Event){
