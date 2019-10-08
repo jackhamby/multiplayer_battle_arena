@@ -2,7 +2,7 @@ import config from '../settings';
 import io from 'socket.io';
 import openSocket from 'socket.io-client';
 import { connect } from 'react-redux';
-import { Message } from '../components/application/application';
+import { Message } from '../types/messages';
 // import { store } from '../App';
 
 
@@ -26,7 +26,7 @@ class ConnectionManager {
     }
 
     connect(){
-        this.socket = openSocket('http://167.99.12.117:3001', {});
+        this.socket = openSocket('http://localhost:3001', {});
         // this.socket.send('hello something');
         this.socket.on('message', this.onMessage.bind(this));
         this.socket.on('connect_error', this.error.bind(this));
@@ -35,9 +35,9 @@ class ConnectionManager {
     }
 
     send(message: string){
-        console.log('\n');
-        console.log(`sending this message to the server ${message}`);
-        console.log('\n');
+        // console.log('\n');
+        // console.log(`sending this message to the server ${message}`);
+        // console.log('\n');
         this.socket.send(message);
     }
 
@@ -46,9 +46,9 @@ class ConnectionManager {
     }
 
     error(event: Event){
-        console.log('\n');
-        console.log('there was an error connecting');
-        console.log('\n');
+        // console.log('\n');
+        // console.log('there was an error connecting');
+        // console.log('\n');
     }
 
 }

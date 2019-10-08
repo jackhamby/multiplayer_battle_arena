@@ -1,5 +1,5 @@
 import React from 'react';
-import { Player, AppState } from '../application/application';
+import { Player, AppState } from '../../types/app_state';
 import *  as redux from 'react-redux';
 
 export interface PlayerListProps {

@@ -1,7 +1,7 @@
 import React from 'react';
 import './game_wrapper.css';
 import ConnectedGame from './game'
-import { Player, AppState } from '../application/application';
+import { Player, AppState } from '../../types/app_state';
 import *  as redux from 'react-redux';
 
 export interface GameWrapperProps {
@@ -9,7 +9,7 @@ export interface GameWrapperProps {
         [key: string] : Player;
     }
     isConnected: boolean;
-    update: Function;
+    update(player: Player): void;
 }
 
 export interface GameWrapperState {
@@ -25,7 +25,6 @@ class GameWrapper extends React.Component<GameWrapperProps, GameWrapperState> {
 
             <div className="col-8 container">
                 <ConnectedGame update={this.props.update}></ConnectedGame>
-    
             </div>
         )
     }

@@ -1,87 +1,22 @@
 import React from 'react';
 import ConnectedGameWrapper from '../game/game_wrapper';
-// import ConnectedPlayerListWrapper from '../player_list/player_list_wrapper';
 import PlayerDetailWrapper from '../player_detail/player_detail_wrapper';
 import HeaderWrapper from '../header/header_wrapper';
 import ConnectionManager from '../../util/connection_manager'
 import Error from '../util/error';
-// import { Provider } from 'react-redux';
 import { createStore} from 'redux';
-// import { rootReducer } from '../../reducers/root_reducer';
-// import io from 'socket.io';
-// import openSocket from 'socket.io-client';
 import *  as redux from 'react-redux';
-// import { connect, disconnect } from '../../reducers/connection_reducer';
 import { ActionCreator } from 'redux';
-// import { addPlayer, removePlayer } from '../../reducers/game_reducer'??/;
-import { connect, disconnect, addPlayer, removePlayer, init, DisconnectAction, REMOVE_PLAYER, updatePlayer } from '../../reducers/root_reducer'
+import { connect, disconnect, update, init } from '../../reducers/root_reducer'
 import ConnectedPlayerListWrapper from '../player_list/player_list_wrapper';
-// import { store } from '../../App';
-
-
-
-export interface AppState {
-    error?: string;
-    isConnected: boolean;
-    players: {
-        [key: string]: Player;
-    }
-    currentPlayerId: string;
-}
-
-export interface Player {
-    id: string;
-    name: string;
-    x: number;
-    y: number;
-}
-
-export interface Message {
-    type: string;
-    data: any;
-}
-
-export const WELCOME_MESSAGE = "welcome";
-export interface WelcomeData {
-    id: string;
-    state: AppState;
-}
-
-export const REMOVE_PLAYER_MESSAGE = "remove_player";
-export interface RemovePlayerData {
-    id: string
-}
-
-export const ADD_PLAYER_MESSAGE = "add_player";
-export interface AddPlayerData {
-    id: string,
-    x: number,
-    y: number,
-}
-
-export const UPDATE_PLAYER_MESSAGE = "update_player";
-export interface UpdatePlayerData {
-    id: string;
-    x: number;
-    y: number;
-}
-
-export const DISCONNECT_MESSAGE = "disconnect";
-export interface DisconnectData {
-    id: string;
-}
-
-
-
-
+import { AppState, Player } from '../../types/app_state';
+import { disconnectMessage, updatePlayerMessage, Message, WELCOME_MESSAGE, UPDATE_MESSAGE } from '../../types/messages';
 
 export interface AppProps {
     connect: () => void;
     disconnect: (event: Event, id: string) => void;
-    addPlayer: (id: string) => void;
-    removePlayer: (id: string) => void;
-    updatePlayer: (id: string, x: number, y: number) => void;
-    init: (state: AppState) => void;
+    update: (state: AppState) => void;
+    init: (playerId: string, state: AppState) => void;
     connectionManager: ConnectionManager;
     players: {
         [key: string]: Player;
@@ -114,33 +49,19 @@ class Application extends React.Component<AppProps, AppState>{
     }
 
     onConnect(){
+        // Dispatch connect action
         this.props.connect();
-        // this.props.addPlayer();
     }
 
     onDisconnect(event: Event){
-        // console.log('on disconnect fired')
+        // Dispatch disconnectaction
         this.props.disconnect(event, this.props.currentPlayerId);
-        const disconnectMessage = {
-            type: DISCONNECT_MESSAGE,
-            data: {
-                id: this.props.currentPlayerId
-            } as DisconnectData
-        } as Message;
-        connectionManager.emit(disconnectMessage);
+        // Alert server of disconnect
+        connectionManager.emit(disconnectMessage(this.props.currentPlayerId));
     }
 
-    onUpdate(id: string, x: number, y: number){
-        // this.props.updatePlayer(id, x, y);
-        const updateMessage = {
-            type: UPDATE_PLAYER_MESSAGE,
-            data: {
-                id,
-                x,
-                y
-            } as UpdatePlayerData
-        } as Message;
-        connectionManager.emit(updateMessage)
+    onPlayerUpdate(player: Player){
+        connectionManager.emit(updatePlayerMessage(player));
     }
 
 
@@ -154,19 +75,12 @@ class Application extends React.Component<AppProps, AppState>{
         // console.log(message)
         switch(message.type){
             case(WELCOME_MESSAGE):
-                this.props.init(message.data.state)
-                this.props.addPlayer(message.data.id);
+                this.props.init(message.data.id, message.data.state)
+                // this.props.addPlayer(message.data.id);
                 break;
-            case(REMOVE_PLAYER_MESSAGE):
-                // console.log(`remove player with this message ${message.type}`)
-                this.props.removePlayer(message.data.id);
-                break;
-            case(ADD_PLAYER_MESSAGE):
-                // console.log(`add player with this message ` )
-                this.props.addPlayer(message.data.id)
-                break;
-            case(UPDATE_PLAYER_MESSAGE):
-                this.props.updatePlayer(message.data.id, message.data.x, message.data.y)
+            case(UPDATE_MESSAGE):
+                console.log('recieved update message')
+                this.props.update(message.data.state)
                 break;
             default:
                 var x = 2;
@@ -175,8 +89,8 @@ class Application extends React.Component<AppProps, AppState>{
     }
 
     render() {
-        // console.log('renderings')
-        // console.log(this.props)
+        
+        console.log(this.props)
         if (!this.props.isConnected){
             return (
                 <div className="container-fluid container">
@@ -191,7 +105,7 @@ class Application extends React.Component<AppProps, AppState>{
                         <HeaderWrapper></HeaderWrapper>
                     </div>
                     <div className="row center-container">
-                        <ConnectedGameWrapper update={this.onUpdate.bind(this)}></ConnectedGameWrapper>
+                        <ConnectedGameWrapper update={this.onPlayerUpdate.bind(this)}></ConnectedGameWrapper>
                         <ConnectedPlayerListWrapper></ConnectedPlayerListWrapper>
                     </div>
                     <div className="row bottom-container">
@@ -214,10 +128,8 @@ export const mapDispatchToProps = (dispatch: Function) => {
     return {
         connect: () => dispatch(connect()),
         disconnect: (event: Event, id: string) => dispatch(disconnect(event, id)),
-        addPlayer: (id: string) => dispatch(addPlayer(id)),
-        removePlayer: (id: string) => dispatch(removePlayer(id)),
-        init: (state: AppState) => dispatch(init(state)),
-        updatePlayer: (id: string, x: number, y: number) => dispatch(updatePlayer(id, x, y))
+        update: (state: AppState) => dispatch(update(state)),
+        init: (playerId: string, state: AppState) => dispatch(init(playerId, state))
     };
 }
 
