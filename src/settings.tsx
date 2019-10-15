@@ -4,8 +4,8 @@ interface AppConfig  {
     gameServerPort: number;
 }
 const config = {
-    // gameServerUrl: 'ws://167.99.12.117',
-    gameServerUrl: "ws://localhost",
+    gameServerUrl: 'ws://167.99.12.117',
+    // gameServerUrl: "ws://localhost",
     gameServerPort: 3001
 } as AppConfig;
 

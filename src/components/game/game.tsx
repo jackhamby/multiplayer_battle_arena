@@ -5,7 +5,6 @@ import * as reactPIXI from '@inlet/react-pixi';
 import * as PIXI from 'pixi.js'
 import { keyboard, Key } from '../../util/keyboard';
 import { contain } from '../../util/contain';
-i
 import * as redux from 'react-redux';
 import { watch } from 'fs';
 // import { Container } from 'pixi.js';
@@ -55,10 +54,8 @@ class Game extends React.Component <GameProps, GameState>{
         const downKey = keyboard("s");
         rightKey.press = () => {
             const currentPlayer = this.props.players[this.props.currentPlayerId];
-            if (contain())
             currentPlayer.xVelocity += 2
             this.props.update(currentPlayer);
-
         };
         rightKey.release = () => {
             const currentPlayer = this.props.players[this.props.currentPlayerId];
@@ -110,10 +107,6 @@ class Game extends React.Component <GameProps, GameState>{
         };
 
         this.state.loader.load(this.setup.bind(this));
-
-    
-        
-
         
     }
 
