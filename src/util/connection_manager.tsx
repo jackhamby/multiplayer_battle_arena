@@ -27,7 +27,7 @@ class ConnectionManager {
 
     connect(){
         // this.socket = openSocket('http://localhost:3001', {});
-        this.socket = openSocket('http://167.99.12.117:3001', {});
+        this.socket = openSocket('http://128.199.51.196:3001', {});
 
         // this.socket.send('hello something');
         this.socket.on('message', this.onMessage.bind(this));
